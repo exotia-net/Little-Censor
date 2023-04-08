@@ -91,6 +91,7 @@ async fn main() -> Result<(), std::io::Error> {
             .wrap(middleware::Logger::default())
             .service(web::resource("/ws").route(web::get().to(websocket_handler)))
     })
+    .workers(2)
     .bind((config.addr, config.port))?
     .run()
     .await
