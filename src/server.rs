@@ -54,7 +54,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
                 self.hb = Instant::now();
             }
             Ok(ws::Message::Text(text)) => {
-                if text.len() <= 0 {
+                if text.len() == 0 {
                     return;
                 } 
                 let command: Vec<&str> = text.split_whitespace().collect();

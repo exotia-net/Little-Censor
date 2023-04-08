@@ -6,8 +6,6 @@ use std::{fs::File, io::Read};
 use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
 
-use env_logger;
-
 use rustrict::{Trie, Type};
 
 use serde::Deserialize;
