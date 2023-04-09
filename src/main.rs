@@ -1,5 +1,6 @@
 mod server;
 mod handlers;
+mod controllers;
 
 use std::{fs::File, io::Read};
 
@@ -84,11 +85,12 @@ async fn main() -> Result<(), std::io::Error> {
         }
     }
 
-    log::info!("Starting HTTP server...");
+    log::info!("Starting HTTP server at {}:{}", config.addr, config.port);
 
     HttpServer::new(|| {
         App::new()
             .wrap(middleware::Logger::default())
+            .configure(controllers::configure())
             .service(web::resource("/ws").route(web::get().to(websocket_handler)))
     })
     .workers(2)
