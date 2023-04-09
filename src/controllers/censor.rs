@@ -1,5 +1,4 @@
 use actix_web::{Responder, post, HttpResponse};
-use serde_json::json;
 
 use crate::handlers::handle_command;
 
@@ -17,6 +16,6 @@ pub async fn censor(
 	let args = &command[1..].to_vec();
 	let res = handle_command(cmd, args.clone());
 	
-	HttpResponse::Ok().json(json!({ "censored": res }))
+	HttpResponse::Ok().body(res)
 }
 
