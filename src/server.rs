@@ -36,6 +36,7 @@ impl Actor for WebSocket {
     type Context = ws::WebsocketContext<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
+        log::info!("Recieved new connection");
         self.hb(ctx);
     }
 }
@@ -43,7 +44,6 @@ impl Actor for WebSocket {
 
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
-       // println!("WS: {msg:?}");
 
         match msg {
             Ok(ws::Message::Ping(msg)) => {
@@ -56,11 +56,12 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocket {
             Ok(ws::Message::Text(text)) => {
                 if text.len() == 0 {
                     return;
-                } 
+                }
                 let command: Vec<&str> = text.split_whitespace().collect();
                 let cmd = command[0];
                 let args = &command[1..].to_vec();
                 let res = handle_command(cmd, args.clone());
+                log::info!("Text message: {:?} resulted in {:?}", text, res);
                 ctx.text(res);
             },
             Ok(ws::Message::Binary(bin)) => ctx.binary(bin),

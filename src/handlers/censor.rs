@@ -1,12 +1,21 @@
 use std::collections::HashMap;
 
+use regex::Regex;
 use rustrict::CensorStr;
 
 const POLISH_LETTERS: [char; 9] = ['ą', 'ć', 'ę', 'ł', 'ń', 'ś', 'ó', 'ź', 'ż'];
 
 pub(super) fn execute(args: Vec<String>) -> String {
-	let sentence: String = args.join(" ");
-	
+	let mut sentence: String = args.join(" ");
+
+    let url_regex = Regex::new(r#"((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)"#).unwrap();
+    let binding = sentence.clone();
+	let matches: Vec<&str> = url_regex.find_iter(&binding).map(|v| v.as_str()).collect();
+
+    for value in matches {
+        sentence = sentence.replace(value, &"*".repeat(value.len()));
+    }
+
 	if sentence.is_inappropriate() {
 		let letter_places = find_polish_letters(sentence.clone());
 		let mut censored = sentence.censor();
