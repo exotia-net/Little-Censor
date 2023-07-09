@@ -8,21 +8,25 @@ const POLISH_LETTERS: [char; 9] = ['ą', 'ć', 'ę', 'ł', 'ń', 'ś', 'ó', 'ź
 pub(super) fn execute(args: Vec<String>) -> String {
 	let mut sentence: String = args.join(" ");
 
-    let url_regex = Regex::new(r#"((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)"#).unwrap();
+    let url_regex = Regex::new(r#"((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)"#).expect("Failed to create regex");
     let binding = sentence.clone();
 	let matches: Vec<&str> = url_regex.find_iter(&binding).map(|v| v.as_str()).collect();
 
+    // Replace links with coresponding number of stars
     for value in matches {
         sentence = sentence.replace(value, &"*".repeat(value.len()));
     }
 
+    // Split uuid of the sentence
+    let (uuid, sentence) = sentence.split_at(36);
+
 	if sentence.is_inappropriate() {
-		let letter_places = find_polish_letters(sentence.clone());
+		let letter_places = find_polish_letters(sentence.to_owned());
 		let mut censored = sentence.censor();
 		fix_sentence(&mut censored, letter_places);
-		censored
+        format!("{}{}", uuid, censored)
 	} else {
-		sentence
+        format!("{}{}", uuid, sentence)
 	}
 }
 
